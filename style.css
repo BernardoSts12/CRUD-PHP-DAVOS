@@ -1,0 +1,22 @@
+.formulario{
+    display: flex ;
+    flex-wrap: wrap;
+}
+
+.formulario {
+    margin: 20px 0; 
+}
+
+.formulario .form-group{
+    padding: 0 5px;
+    margin-top: 5px;
+}
+
+.btn{
+    
+    margin: 10px 5px;
+}
+
+.tabela{
+    margin-top: 50px;
+}
