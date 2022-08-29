@@ -29,19 +29,43 @@ class Aluno
         }
     }
 
-    public function trazerAlunos(){
+    public function trazerAlunos()
+    {
         $lista_alunos = $this->conn->query("SELECT * FROM alunos ORDER BY id DESC ")->fetchAll();
         return $lista_alunos;
     }
 
     public function deletarAluno($id)
     {
-        try {
+      
             $deletar_aluno = $this->conn->query("DELETE FROM alunos WHERE id =" . $id);
             $deletar_aluno->execute();
             header("Location: index.php");
-        } catch (PDOException  $e) {
-            echo $e->getMessage();
+        
+    }
+
+    public function buscarDadosAluno($id)
+    {
+
+        $aluno = $this->conn->query("SELECT * FROM alunos WHERE id = " . $id);
+        $aluno->execute();
+
+        return $aluno->fetch();
+    }
+
+    public function atualizarDadosAluno($id, $dados)
+    {
+        try{
+        $aluno = $this->conn->query("UPDATE alunos SET nome ='".$dados['nome']."',email ='".$dados['email']."'
+                                    ,situacao ='".$dados['situacao']."',telefone ='" .$dados['telefone']."', mensalidade='".$dados['mensalidade']."',
+                                    senha='".$dados['senha']."', observacao='".$dados['observacao']."' WHERE id = ".$id);
+        
+        $aluno->execute();
+        header("Location: index.php");
+        }catch(PDOException $e){
+            // echo $e->getMessage();
         }
+        
+    
     }
 }

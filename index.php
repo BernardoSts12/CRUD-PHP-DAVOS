@@ -3,7 +3,7 @@ require_once 'Aluno.php';
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 
 <head>
     <meta charset="UTF-8">
@@ -23,48 +23,80 @@ require_once 'Aluno.php';
         //RECEBENDO OS DADOS DO FORMULÁRIO E SALVANDO NO BANCO DE DADOS
         $dados = filter_input_array(INPUT_POST, FILTER_DEFAULT);
         $Aluno = new Aluno();
-        $Aluno->cadastrarAluno($dados);
+
+        if (isset($_GET['id_update']) && !empty($_GET['id_update'])) {
+            $id = $_GET['id_update'];
+            $Aluno->atualizarDadosAluno($id, $dados);
+        } else {
+            $Aluno->cadastrarAluno($dados);
+        }
+
+
+        ?>
+
+        <?php
+        if (isset($_GET['id_update'])) {
+
+            $id_update = $_GET['id_update'];
+            $res = $Aluno->buscarDadosAluno($id_update);
+        }
         ?>
 
         <form class="col-md-12 formulario" method="POST" action="">
             <h3 class="col-md-12">Cadastrar alunos</h3>
             <div class="form-group col-md-6">
                 <label for="name">Nome</label>
-                <input type="text" class="form-control form-control-sm" id="nome" name="nome">
+                <input type="text" class="form-control form-control-sm" id="nome" name="nome" value="<?php if (isset($res)) {
+                                                                                                            echo $res['nome'];
+                                                                                                        } ?>">
             </div>
             <div class="form-group col-md-6">
 
                 <label for="email">Email</label>
-                <input type="email" class="form-control form-control-sm" id="email" name="email">
+                <input type="email" class="form-control form-control-sm" id="email" name="email" value="<?php if (isset($res)) {
+                                                                                                            echo $res['email'];
+                                                                                                        } ?>">
 
             </div>
             <div class="form-group col-md-6">
                 <label for="password">Senha</label>
-                <input type="password" class="form-control form-control-sm" id="senha" name="senha">
+                <input type="password" class="form-control form-control-sm" id="senha" name="senha" value="<?php if (isset($res)) {
+                                                                                                                echo $res['senha'];
+                                                                                                            } ?>">
             </div>
             <div class="form-group col-md-6">
                 <label for="mensalidade">Mensalidade</label>
-                <input type="number" class="form-control form-control-sm" id="mensalidade" name="mensalidade">
+                <input type="text" class="form-control form-control-sm" id="mensalidade" name="mensalidade" value=<?php if (isset($res)) {
+                                                                                                                            echo $res['mensalidade'];
+                                                                                                                        } ?>>
             </div>
             <div class="form-group col-md-6">
-                <label for="mensalidade">Telefone</label>
-                <input type="number" class="form-control form-control-sm" id="mensalidade" name="telefone">
+                <label for="telefone">Telefone</label>
+                <input type="phone" class="form-control form-control-sm" id="telefone" name="telefone" value=<?php if (isset($res)) {
+                                                                                                                        echo $res['telefone'];
+                                                                                                                    } ?>>
             </div>
             <div class="form-group col-md-6">
                 <label for="situacao">Situação</label>
                 <select class="form-control form-control-sm" id="situacao" name="situacao">
                     <option></option>
-                    <option value="Ativo">Ativo</option>
-                    <option value="Inativo">Inativo</option>
+                    <option value="Ativo" <?php if (isset($res) && $res['situacao'] == "Ativo") { ?> selected <?php } ?>>Ativo</option>
+                    <option value="Inativo" <?php if (isset($res) && $res['situacao'] == "Inativo") { ?> selected <?php } ?>>Inativo</option>
                 </select>
             </div>
 
             <div class="form-group col-md-6">
                 <label for="observacao">Observação</label>
-                <textarea name="observacao" id="observacao" class="form-control form-control-sm" id="observacao" rows="1"></textarea>
+                <textarea name="observacao" id="observacao" class="form-control form-control-sm" id="observacao" rows="1"><?php if (isset($res)) {
+                                                                                                                                echo $res['observacao'];
+                                                                                                                            } ?></textarea>
             </div>
 
-            <input type="submit" class="btn btn-primary" name="cadastro_usuario" value="Salvar"></input>
+            <input type="submit" class="btn btn-primary" name="cadastro_usuario" <?php if (isset($res)) {
+                                                                                        echo "value='Atualizar'";
+                                                                                    } else {
+                                                                                        echo "value='Cadastrar'";
+                                                                                    } ?>></input>
         </form>
 
         <div class="col-md-12 tabela">
@@ -86,9 +118,8 @@ require_once 'Aluno.php';
                     <?php
 
                     //TRAZENDO TODOS OS ALUNOS CADASTRADOS
-                    $aluno = new Aluno();
-                    $lista_alunos = $aluno->trazerAlunos($dados);
-                
+                    $lista_alunos = $Aluno->trazerAlunos($dados);
+
                     foreach ($lista_alunos as $la) {
                         echo "<tr>";
                         echo "<td>" . $la['id'] . "</td>";
@@ -103,7 +134,7 @@ require_once 'Aluno.php';
                     ?>
 
                         <td>
-                            <a href="" class='btn btn-primary'><i class='fa fa-pencil' aria-hidden='true'></i></a>
+                            <a href="index.php?id_update=<?php echo $la['id'] ?>" class='btn btn-primary'><i class='fa fa-pencil' aria-hidden='true'></i></a>
                             <a href="index.php?id=<?php echo $la['id'] ?>" class='btn btn-danger'><i class='fa fa-trash' aria-hidden='true'></i></a>
                         </td>
 
@@ -129,8 +160,7 @@ require_once 'Aluno.php';
 if (isset($_GET['id'])) {
 
     $id_aluno = $_GET['id'];
-    $Aluno = new Aluno();
-    $Aluno->deletarAluno($id_aluno);
 
+    $Aluno->deletarAluno($id_aluno);
 }
 ?>
