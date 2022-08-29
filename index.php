@@ -20,7 +20,6 @@ require_once 'conexao.php';
 <body>
     <div class="container">
         <?php
-
         //RECEBENDO OS DADOS DO FORMULÁRIO E SALVANDO NO BANCO DE DADOS
         $dados = filter_input_array(INPUT_POST, FILTER_DEFAULT);
         if (!empty($dados['cadastro_usuario'])) {
@@ -28,12 +27,12 @@ require_once 'conexao.php';
             $salvar_aluno = "INSERT INTO alunos (nome, email, situacao, telefone, mensalidade, senha, observacao) VALUES (
             '" . $dados['nome'] . "','" . $dados['email'] . "','" . $dados['situacao'] . "','" . $dados['telefone'] . "','" . $dados['mensalidade'] . "','" . $dados['senha'] . "','" . $dados['observacao'] . "')";
 
-            $cad_aluno = $conn->prepare($salvar_aluno);
-            $cad_aluno->execute();
+            $cadastrar_aluno = $conn->prepare($salvar_aluno);
+            $cadastrar_aluno->execute();
         }
         ?>
 
-        <form class="col-md-12 formulario" method="POST" action="" name="cad_aluno">
+        <form class="col-md-12 formulario" method="POST" action="">
             <h3 class="col-md-12">Cadastrar alunos</h3>
             <div class="form-group col-md-6">
                 <label for="name">Nome</label>
@@ -105,14 +104,16 @@ require_once 'conexao.php';
                         echo "<td>" . $la['mensalidade'] . "</td>";
                         echo "<td>" . $la['observacao'] . "</td>";
 
-                        echo "
-                            <td>
-                                <a href='' class='btn btn-primary'><i class='fa fa-pencil' aria-hidden='true'></i></a>
-                                <a href='' class='btn btn-danger'><i class='fa fa-trash' aria-hidden='true'></i></a>
-                            </td> ";
+                    ?>
 
-                        echo "</tr>";
-                    } ?>
+                        <td>
+                            <a href="" class='btn btn-primary'><i class='fa fa-pencil' aria-hidden='true'></i></a>
+                            <a href="index.php?id=<?php echo $la['id']?>" class='btn btn-danger'><i class='fa fa-trash' aria-hidden='true'></i></a>
+                        </td> 
+
+                        </tr>
+
+                    <?php } ?>
 
                 </tbody>
             </table>
@@ -125,3 +126,19 @@ require_once 'conexao.php';
 </body>
 
 </html>
+
+<?php 
+    if(isset($_GET['id'])){
+        
+        $id_aluno = $_GET['id'];
+
+        try{
+            $deletar_aluno = $conn->query("DELETE FROM alunos WHERE id =".$id_aluno);
+            $deletar_aluno->execute();
+            header("Location: index.php");
+        }catch(PDOException  $e){
+            echo $e->getMessage();
+        }
+        
+    }
+?>
