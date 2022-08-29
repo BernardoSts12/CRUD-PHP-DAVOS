@@ -1,5 +1,5 @@
 <?php
-require_once 'conexao.php';
+require_once 'Aluno.php';
 ?>
 
 <!DOCTYPE html>
@@ -22,14 +22,8 @@ require_once 'conexao.php';
         <?php
         //RECEBENDO OS DADOS DO FORMULÁRIO E SALVANDO NO BANCO DE DADOS
         $dados = filter_input_array(INPUT_POST, FILTER_DEFAULT);
-        if (!empty($dados['cadastro_usuario'])) {
-
-            $salvar_aluno = "INSERT INTO alunos (nome, email, situacao, telefone, mensalidade, senha, observacao) VALUES (
-            '" . $dados['nome'] . "','" . $dados['email'] . "','" . $dados['situacao'] . "','" . $dados['telefone'] . "','" . $dados['mensalidade'] . "','" . $dados['senha'] . "','" . $dados['observacao'] . "')";
-
-            $cadastrar_aluno = $conn->prepare($salvar_aluno);
-            $cadastrar_aluno->execute();
-        }
+        $Aluno = new Aluno();
+        $Aluno->cadastrarAluno($dados);
         ?>
 
         <form class="col-md-12 formulario" method="POST" action="">
@@ -91,8 +85,10 @@ require_once 'conexao.php';
                 <tbody>
                     <?php
 
-                    $lista_alunos = $conn->query("SELECT * FROM alunos ORDER BY id DESC ")->fetchAll();
-
+                    //TRAZENDO TODOS OS ALUNOS CADASTRADOS
+                    $aluno = new Aluno();
+                    $lista_alunos = $aluno->trazerAlunos($dados);
+                
                     foreach ($lista_alunos as $la) {
                         echo "<tr>";
                         echo "<td>" . $la['id'] . "</td>";
@@ -108,8 +104,8 @@ require_once 'conexao.php';
 
                         <td>
                             <a href="" class='btn btn-primary'><i class='fa fa-pencil' aria-hidden='true'></i></a>
-                            <a href="index.php?id=<?php echo $la['id']?>" class='btn btn-danger'><i class='fa fa-trash' aria-hidden='true'></i></a>
-                        </td> 
+                            <a href="index.php?id=<?php echo $la['id'] ?>" class='btn btn-danger'><i class='fa fa-trash' aria-hidden='true'></i></a>
+                        </td>
 
                         </tr>
 
@@ -127,18 +123,14 @@ require_once 'conexao.php';
 
 </html>
 
-<?php 
-    if(isset($_GET['id'])){
-        
-        $id_aluno = $_GET['id'];
 
-        try{
-            $deletar_aluno = $conn->query("DELETE FROM alunos WHERE id =".$id_aluno);
-            $deletar_aluno->execute();
-            header("Location: index.php");
-        }catch(PDOException  $e){
-            echo $e->getMessage();
-        }
-        
-    }
+<!-- DELETAR ALUNOS DO BD -->
+<?php
+if (isset($_GET['id'])) {
+
+    $id_aluno = $_GET['id'];
+    $Aluno = new Aluno();
+    $Aluno->deletarAluno($id_aluno);
+
+}
 ?>
